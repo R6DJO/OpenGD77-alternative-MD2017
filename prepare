@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+if [ -d MD2017_firmware/application/source/linkerdata ]; then
+    if [ -e MD2017_firmware/tools/codec_cleaner.Linux -a -x MD2017_firmware/tools/codec_cleaner.Linux ]; then
+	cd MD2017_firmware/application/source/linkerdata && ../../../tools/codec_cleaner.Linux -C
+    else
+	echo "Error: The required tools are not installed in MD2017_firmware/tools, the process cannot be completed."
+	exit 1
+    fi
+else
+	echo "Error: Your source tree is incomplete, please fix this."
+	exit 1
+fi
+
+exit 0
