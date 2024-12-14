@@ -1,6 +1,0 @@
-../application/source/interfaces/gpio.c:52:6:gpioInitDisplay	8	static
-../application/source/interfaces/gpio.c:59:6:gpioSetDisplayBacklightIntensityPercentage	16	static
-../application/source/interfaces/gpio.c:95:9:gpioGetDisplayBacklightIntensityPercentage	0	static
-../application/source/interfaces/gpio.c:106:6:gpioInitKeyboard	0	static
-../application/source/interfaces/gpio.c:110:6:gpioInitLEDs	0	static
-../application/source/interfaces/gpio.c:114:6:gpioInitRotarySwitch	0	static

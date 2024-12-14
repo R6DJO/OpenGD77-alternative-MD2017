@@ -1,8 +1,0 @@
-../application/source/io/keyboard.c:272:10:keyboardRead	72	static
-../application/source/io/keyboard.c:328:6:keyboardKeyIsDTMFKey	0	static
-../application/source/io/keyboard.c:344:6:trackballReset	0	static
-../application/source/io/keyboard.c:247:6:keyboardInit	0	static
-../application/source/io/keyboard.c:262:6:keyboardReset	0	static
-../application/source/io/keyboard.c:350:6:trackballSetMotion	0	static
-../application/source/io/keyboard.c:356:6:trackballISR	0	static
-../application/source/io/keyboard.c:398:6:keyboardCheckKeyEvent	32	static
