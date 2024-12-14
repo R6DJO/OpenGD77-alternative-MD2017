@@ -1,0 +1,6 @@
+../application/source/interfaces/adc.c:73:6:adcStartDMA	8	static
+../application/source/interfaces/adc.c:81:6:HAL_ADC_ConvCpltCallback	8	static
+../application/source/interfaces/adc.c:104:5:adcGetBatteryVoltage	0	static
+../application/source/interfaces/adc.c:109:5:adcGetVOX	0	static
+../application/source/interfaces/adc.c:114:5:getTemperature	0	static
+../application/source/interfaces/adc.c:124:8:getVolumeControl	0	static

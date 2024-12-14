@@ -46,7 +46,7 @@ enum
 
 static const char *creditTexts[] =
 {
-		"Roger VK3KYY", "Daniel F1RMB", "Kai DG4KLU", "Colin G4EML", "Alex DL4LEX",
+		"OpenGD77 RUS:", "Aufwiegler", "https://opengd77rus.ru", "", "OpenGD77:", "Roger VK3KYY", "Daniel F1RMB", "Kai DG4KLU", "Colin G4EML", "Alex DL4LEX",
 #if defined(PLATFORM_RD5R)
 		"Dzmitry EW1ADG",
 #endif
@@ -165,15 +165,8 @@ static void displayBuildDetails(bool playVP)
 
 	displayClearBuf();
 
-	sprintf(dateTimeBuf, "%d%02d%02d%02d%02d%02d", BUILD_YEAR, BUILD_MONTH, BUILD_DAY, BUILD_HOUR, BUILD_MIN, BUILD_SEC);
+	sprintf(dateTimeBuf, "%d%02d%02d", BUILD_YEAR, BUILD_MONTH, BUILD_DAY);
 
-#if defined(PLATFORM_MD9600) || defined(PLATFORM_MDUV380) || defined(PLATFORM_MD380) || defined(PLATFORM_RT84_DM1701) || defined(PLATFORM_MD2017)
-	snprintf(versionBuf, SCREEN_LINE_BUFFER_SIZE, "[ %s", XSTRINGIFY(GITVERSION));
-#else
-	snprintf(versionBuf, SCREEN_LINE_BUFFER_SIZE, "[ %s", GITVERSION);
-#endif
-	versionBuf[9] = 0; // git hash id 7 char long;
-	strcat(versionBuf, (uiDataGlobal.dmrDisabled ? " F ]" : " D ]"));
 
 
 #if defined(PLATFORM_RD5R)
@@ -185,7 +178,7 @@ static void displayBuildDetails(bool playVP)
 	displayPrintCentered(5, radioModel, FONT_SIZE_3);
 	displayPrintCentered(20, currentLanguage->built, FONT_SIZE_2);
 	displayPrintCentered(30, dateTimeBuf , FONT_SIZE_2);
-	displayPrintCentered(40, versionBuf, FONT_SIZE_2);
+	//displayPrintCentered(40, versionBuf, FONT_SIZE_2);
 #endif
 
 // STM32 platforms (Genuine or Clone)

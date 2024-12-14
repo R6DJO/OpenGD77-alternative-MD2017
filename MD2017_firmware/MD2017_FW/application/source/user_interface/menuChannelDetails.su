@@ -1,0 +1,10 @@
+../application/source/user_interface/menuChannelDetails.c:694:13:updateFrequency	0	static
+../application/source/user_interface/menuChannelDetails.c:174:13:updateScreen	472	static
+../application/source/user_interface/menuChannelDetails.c:1551:13:saveChanges	24	static
+../application/source/user_interface/menuChannelDetails.c:157:13:updateCursor	8	static
+../application/source/user_interface/menuChannelDetails.c:1440:13:cssIncrementFromEvent	24	static
+../application/source/user_interface/menuChannelDetails.c:1587:13:applyShiftOffset.part.0	56	static
+../application/source/user_interface/menuChannelDetails.c:1495:13:cssDecrementFromEvent	24	static
+../application/source/user_interface/menuChannelDetails.c:1625:13:exitCallback	8	static
+../application/source/user_interface/menuChannelDetails.c:709:13:handleEvent	304	static
+../application/source/user_interface/menuChannelDetails.c:97:14:menuChannelDetails	24	static
