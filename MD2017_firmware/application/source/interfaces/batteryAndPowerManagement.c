@@ -262,12 +262,7 @@ void batteryUpdate(void)
 				headerRowIsDirty = true;
 			}
 
-			batteryVoltageCallbackTick++;
-			if (batteryVoltageCallbackTick >= BATTERY_VOLTAGE_CALLBACK_TICK_RELOAD)
-			{
-				menuRadioInfosPushBackVoltage(averageBatteryVoltage);
-				batteryVoltageCallbackTick = 0;
-			}
+
 		}
 
 		batteryVoltageTick = 0;

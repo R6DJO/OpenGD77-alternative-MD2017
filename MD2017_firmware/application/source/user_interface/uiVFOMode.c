@@ -641,6 +641,7 @@ void uiVFOModeUpdateScreen(int txTimeSecs)
 
 				}
 			}
+			displayPrintAt(0, DISPLAY_Y_POS_TX_FREQ + 22, currentLanguage->vfomenu, FONT_SIZE_3);
 			displayRender();
 			break;
 
@@ -2537,6 +2538,10 @@ static void updateQuickMenuScreen(bool isFirstRun)
 					}
 					else
 					{
+
+					if (currentLanguage->LANGUAGE_NAME[0] == 'Р')
+						snprintf(rightSideVar, SCREEN_LINE_BUFFER_SIZE, "%s", DMR_DESTINATION_FILTER_LEVELS_RUS[uiDataGlobal.QuickMenu.tmpDmrDestinationFilterLevel - 1]);
+					else
 						snprintf(rightSideVar, SCREEN_LINE_BUFFER_SIZE, "%s", DMR_DESTINATION_FILTER_LEVELS[uiDataGlobal.QuickMenu.tmpDmrDestinationFilterLevel - 1]);
 					}
 					break;
@@ -3312,7 +3317,7 @@ static void sweepScanStep(void)
 
 		if (uiDataGlobal.Scan.sweepSampleIndex < VFO_SWEEP_NUM_SAMPLES)
 		{
-#if defined(PLATFORM_MD380) || defined(PLATFORM_MDUV380) || defined(PLATFORM_RT84_DM1701) || defined(PLATFORM_MD2017) || defined(PLATFORM_MD9600)
+#if defined(PLATFORM_MD380) || defined(PLATFORM_MDUV380) || defined(PLATFORM_RT84_DM1701) || defined(PLATFORM_MD2017)
 			radioReadRSSIAndNoiseForBand(currentRadioDevice->trxCurrentBand[TRX_RX_FREQ_BAND]);
 #else
 			radioReadRSSIAndNoise();
