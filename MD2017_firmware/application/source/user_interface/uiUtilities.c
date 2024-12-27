@@ -1919,7 +1919,7 @@ void uiUtilityRenderHeader(bool isVFODualWatchScanning, bool isVFOSweepScanning)
 				{
 					bool aprsSuspended = false;
 
-					strcpy(buffer, "A");
+					strcpy(buffer, "APRS");
 
 #if ! defined(PLATFORM_GD77S)
 					if ((aprsBeaconingGetMode() == APRS_BEACONING_MODE_OFF) || aprsBeaconingIsSuspended())
@@ -1927,8 +1927,10 @@ void uiUtilityRenderHeader(bool isVFODualWatchScanning, bool isVFOSweepScanning)
 						aprsSuspended = true;
 					}
 #endif
-					displayPrintCore(MODE_TEXT_X_OFFSET + (modePixelLen + 6), DISPLAY_Y_POS_HEADER, buffer,
+					displayThemeResetToDefault();
+					displayPrintCore(DISPLAY_X_POS_APRS, DISPLAY_Y_POS_SECONDSTRING, buffer,
 							(aprsSuspended ? FONT_SIZE_1 : FONT_SIZE_1_BOLD), TEXT_ALIGN_LEFT, false);
+					displayThemeApply(THEME_ITEM_FG_HEADER_TEXT, THEME_ITEM_BG_HEADER_TEXT);
 				}
 			}
 
@@ -2060,14 +2062,7 @@ void uiUtilityRenderHeader(bool isVFODualWatchScanning, bool isVFOSweepScanning)
 		displayPrintCore(ccXPos, DISPLAY_Y_POS_HEADER, buffer, FONT_SIZE_1, TEXT_ALIGN_LEFT, isNotFilteringCC);
 	}
 
-#if defined(HAS_GPS)
-#if defined(PLATFORM_MD380) || defined(PLATFORM_MDUV380) || defined(PLATFORM_RT84_DM1701) || defined(PLATFORM_MD2017)
-	if (nonVolatileSettings.gps >= GPS_MODE_ON)
-	{
-		displayPrintCore(DISPLAY_SIZE_X - 50, DISPLAY_Y_POS_HEADER, "G", ((gpsData.Status & GPS_STATUS_HAS_FIX) ? FONT_SIZE_1_BOLD : FONT_SIZE_1), TEXT_ALIGN_LEFT, false);
-	}
-#endif
-#endif
+
 
 	// Display battery percentage/voltage
 	bool apoEnabled = (nonVolatileSettings.apo > 0);
@@ -2092,6 +2087,14 @@ void uiUtilityRenderHeader(bool isVFODualWatchScanning, bool isVFOSweepScanning)
 	}
 
 	displayThemeResetToDefault();
+#if defined(HAS_GPS)
+#if defined(PLATFORM_MD380) || defined(PLATFORM_MDUV380) || defined(PLATFORM_RT84_DM1701) || defined(PLATFORM_MD2017)
+	if (nonVolatileSettings.gps >= GPS_MODE_ON)
+	{
+		displayPrintCore(DISPLAY_X_POS_GPS, DISPLAY_Y_POS_SECONDSTRING, "GPS", ((gpsData.Status & GPS_STATUS_HAS_FIX) ? FONT_SIZE_1_BOLD : FONT_SIZE_1), TEXT_ALIGN_LEFT, false);
+	}
+#endif
+#endif
 }
 
 void uiUtilityRedrawHeaderOnly(bool isVFODualWatchScanning, bool isVFOSweepScanning)
@@ -2121,16 +2124,12 @@ static int dBm = 0;
 
 
 
-static void drawHeaderBar(int *barWidth, int16_t barHeight, bool isRSSI)
+static void drawRSSIBar(int *barWidth, int16_t barHeight, bool isRSSI)
 {
-	*barWidth = CLAMP(*barWidth, BAR_X, DISPLAY_SIZE_X);
 	displayThemeApply(THEME_ITEM_FG_DEFAULT, THEME_ITEM_BG);
-	displayDrawRect((BAR_X - 2), (DISPLAY_Y_POS_RSSI - 2), (DISPLAY_SIZE_X - (BAR_X - 2)), (8 + 4), true);
+	*barWidth = CLAMP(*barWidth, 0, DISPLAY_SIZE_X - BAR_X - 2);
+	displayDrawRect((BAR_X - 2), (DISPLAY_Y_POS_RSSI - 2), (DISPLAY_SIZE_X - (BAR_X * 2 - 2)), (8 + 4), true);
 	displayDrawFastVLine((DISPLAY_SIZE_X - 1), (DISPLAY_Y_POS_RSSI - 1), (8 + 2), false);
-	if (isRSSI)
-		displayPrintAt(1, DISPLAY_Y_POS_RSSI, "S", FONT_SIZE_1_BOLD);
-	else
-		displayPrintAt(1, DISPLAY_Y_POS_RSSI, "M", FONT_SIZE_1_BOLD);
 	int xPos;
 	int currentMode = trxGetMode();
     if (isRSSI)
@@ -2165,6 +2164,11 @@ static void drawHeaderBar(int *barWidth, int16_t barHeight, bool isRSSI)
 		displayFillRect(*barWidth, DISPLAY_Y_POS_RSSI, (DISPLAY_SIZE_X - *barWidth), barHeight, true);
 	}
 	displayThemeResetToDefault();
+	displayDrawRect((BAR_X - 2), (DISPLAY_Y_POS_RSSI - 2), (DISPLAY_SIZE_X - (BAR_X * 2 - 2)), (8 + 4), true);
+	if (isRSSI)
+		displayPrintAt(1, DISPLAY_Y_POS_RSSI, "S", FONT_SIZE_1_BOLD);
+	else
+		displayPrintAt(1, DISPLAY_Y_POS_RSSI, "M", FONT_SIZE_1_BOLD);
 }
 
 
@@ -2183,7 +2187,7 @@ void uiUtilityDrawRSSIBarGraph(void)
 	rssi = (rssi - SMETER_S0) * 2;
 	int barWidth = ((rssi * rssiMeterHeaderBarNumUnits) / rssiMeterHeaderBarDivider);
 	barWidth = CLAMP((barWidth - 1), 0, (DISPLAY_SIZE_X - BAR_X));
-	drawHeaderBar(&barWidth, 8, true);
+	drawRSSIBar(&barWidth, 8, true);
 
 	int xPos = 0;
 
@@ -2225,14 +2229,14 @@ void uiUtilityDrawFMMicLevelBarGraph(void)
 			((uint16_t)(((float)DISPLAY_SIZE_X / 50.0) * ((float)micdB - 50.0))) // display from 50dB to 100dB, span over 128pix
 #endif
 			, DISPLAY_SIZE_X);
-	drawHeaderBar(&barWidth, 8, false);
+	drawRSSIBar(&barWidth, 8, false);
 }
 
 void uiUtilityDrawDMRMicLevelBarGraph(void)
 {
 	int barWidth = ((uint16_t)(sqrt(micAudioSamplesTotal) * 1.5));
 	barWidth = CLAMP((barWidth - 1), 0, (DISPLAY_SIZE_X - BAR_X));
-	drawHeaderBar(&barWidth, 8, false);
+	drawRSSIBar(&barWidth, 8, false);
 }
 
 void setOverrideTGorPC(uint32_t tgOrPc, bool privateCall)

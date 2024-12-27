@@ -134,6 +134,9 @@ typedef uint32_t time_t_custom;     /* date/time in unix secs past 1-Jan-70 */
 #define DISPLAY_Y_POS_RSSI_BAR               (40 + DISPLAY_V_OFFSET)
 #define TITLE_BOX_HEIGHT                      21
 #elif defined(PLATFORM_MD2017)
+#define DISPLAY_X_POS_GPS 4
+#define DISPLAY_X_POS_APRS 30
+#define DISPLAY_Y_POS_SECONDSTRING 13
 #define DISPLAY_Y_POS_BAR                     12
 #define DISPLAY_Y_POS_RSSI                   42
 #define DISPLAY_Y_POS_RSSI_VALUE              16
