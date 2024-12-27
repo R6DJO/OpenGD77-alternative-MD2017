@@ -89,8 +89,7 @@ typedef uint32_t time_t_custom;     /* date/time in unix secs past 1-Jan-70 */
 #define DISPLAY_Y_POS_RX_FREQ                 31
 #define DISPLAY_Y_POS_TX_FREQ                 40
 #define DISPLAY_Y_POS_ZONE                    40
-#define DISPLAY_Y_POS_RSSI_VALUE              16
-#define DISPLAY_Y_POS_RSSI_BAR                27
+
 #define TITLE_BOX_HEIGHT                      15
 #elif defined(PLATFORM_MD380) || defined(PLATFORM_MDUV380) || defined(PLATFORM_RT84_DM1701)
 #define DISPLAY_H_EXTRA_PIXELS                32
@@ -111,12 +110,14 @@ typedef uint32_t time_t_custom;     /* date/time in unix secs past 1-Jan-70 */
 #define DISPLAY_X_POS_MENU_OFFSET              4
 #define DISPLAY_X_POS_MENU_TEXT_OFFSET       (DISPLAY_X_POS_MENU_OFFSET + 4)
 #define DISPLAY_Y_POS_MENU_START             (16 + MENU_ENTRY_HEIGHT)
+#define DISPLAY_X_POS_DBM                      90
 #if defined(PLATFORM_VARIANT_DM1701)
 #define DISPLAY_Y_POS_MENU_ENTRY_HIGHLIGHT   (32 + DISPLAY_V_OFFSET - (MENU_ENTRY_HEIGHT / 2))
 #else
 #define DISPLAY_Y_POS_MENU_ENTRY_HIGHLIGHT   (32 + DISPLAY_V_OFFSET)
 #endif
-#define DISPLAY_Y_POS_BAR                     10
+#define DISPLAY_Y_POS_BAR                     12
+#define DISPLAY_Y_POS_RSSI                   42
 #define DISPLAY_Y_POS_CONTACT                (16 + 8)
 #define DISPLAY_Y_POS_CONTACT_TX             (34 + DISPLAY_V_OFFSET)
 #define DISPLAY_Y_POS_CONTACT_TX_FRAME       (34 + DISPLAY_V_OFFSET)
@@ -125,7 +126,7 @@ typedef uint32_t time_t_custom;     /* date/time in unix secs past 1-Jan-70 */
 #define DISPLAY_Y_POS_SQUELCH_BAR             16
 #define DISPLAY_Y_POS_CSS_INFO               (16 + 8)
 #define DISPLAY_Y_POS_SQL_INFO               (25 + 8)
-#define DISPLAY_Y_POS_TX_TIMER                (8 + 16)
+#define DISPLAY_Y_POS_TX_TIMER                8//(8 + 16)
 #define DISPLAY_Y_POS_RX_FREQ                (40 + 32)
 #define DISPLAY_Y_POS_TX_FREQ                (48 + 40)
 #define DISPLAY_Y_POS_ZONE                   (32 + DISPLAY_V_EXTRA_PIXELS)
@@ -133,6 +134,10 @@ typedef uint32_t time_t_custom;     /* date/time in unix secs past 1-Jan-70 */
 #define DISPLAY_Y_POS_RSSI_BAR               (40 + DISPLAY_V_OFFSET)
 #define TITLE_BOX_HEIGHT                      21
 #elif defined(PLATFORM_MD2017)
+#define DISPLAY_Y_POS_BAR                     12
+#define DISPLAY_Y_POS_RSSI                   42
+#define DISPLAY_Y_POS_RSSI_VALUE              16
+#define DISPLAY_Y_POS_RSSI_BAR                27
 #define DISPLAY_H_EXTRA_PIXELS                32
 #define DISPLAY_H_OFFSET                     (DISPLAY_H_EXTRA_PIXELS / 2)
 #define DISPLAY_V_EXTRA_PIXELS                64
@@ -163,6 +168,7 @@ typedef uint32_t time_t_custom;     /* date/time in unix secs past 1-Jan-70 */
 #define DISPLAY_Y_POS_ZONE                   (50 + DISPLAY_V_EXTRA_PIXELS)
 #define DISPLAY_Y_POS_RSSI_VALUE             (DISPLAY_V_OFFSET - 12)
 #define DISPLAY_Y_POS_RSSI_BAR               (DISPLAY_V_OFFSET + 10)
+#define DISPLAY_X_POS_DBM                      90
 #define TITLE_BOX_HEIGHT                      21
 #elif defined(PLATFORM_MD9600)
 #define DISPLAY_H_EXTRA_PIXELS                 0
