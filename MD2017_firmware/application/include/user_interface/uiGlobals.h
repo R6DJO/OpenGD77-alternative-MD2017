@@ -156,7 +156,6 @@ typedef uint32_t time_t_custom;     /* date/time in unix secs past 1-Jan-70 */
 #define DISPLAY_X_POS_MENU_TEXT_OFFSET       (DISPLAY_X_POS_MENU_OFFSET + 4)
 #define DISPLAY_Y_POS_MENU_START             (16 + MENU_ENTRY_HEIGHT)
 #define DISPLAY_Y_POS_MENU_ENTRY_HIGHLIGHT   (32 + DISPLAY_V_OFFSET)
-#define DISPLAY_Y_POS_BAR                     10
 #define DISPLAY_Y_POS_CONTACT                (16 + 8)
 #define DISPLAY_Y_POS_CONTACT_TX             (34 + DISPLAY_V_OFFSET)
 #define DISPLAY_Y_POS_CONTACT_TX_FRAME       (34 + DISPLAY_V_OFFSET)
@@ -166,76 +165,10 @@ typedef uint32_t time_t_custom;     /* date/time in unix secs past 1-Jan-70 */
 #define DISPLAY_Y_POS_CSS_INFO               (16 + 8)
 #define DISPLAY_Y_POS_SQL_INFO               (25 + 8)
 #define DISPLAY_Y_POS_TX_TIMER                (8 + 16)
-#define DISPLAY_Y_POS_RX_FREQ                (40 + 40)
-#define DISPLAY_Y_POS_TX_FREQ                (48 + 48)
+#define DISPLAY_Y_POS_RX_FREQ                (40 + 30)
+#define DISPLAY_Y_POS_TX_FREQ                (48 + 40)
 #define DISPLAY_Y_POS_ZONE                   (50 + DISPLAY_V_EXTRA_PIXELS)
-#define DISPLAY_Y_POS_RSSI_VALUE             (DISPLAY_V_OFFSET - 12)
-#define DISPLAY_Y_POS_RSSI_BAR               (DISPLAY_V_OFFSET + 10)
-#define DISPLAY_X_POS_DBM                      90
-#define TITLE_BOX_HEIGHT                      21
-#elif defined(PLATFORM_MD9600)
-#define DISPLAY_H_EXTRA_PIXELS                 0
-#define DISPLAY_H_OFFSET                       0
-#define DISPLAY_V_EXTRA_PIXELS                 0
-#define DISPLAY_V_OFFSET                       0
-#define MENU_ENTRY_HEIGHT                     16
-#define SQUELCH_BAR_H                          9
-#define V_OFFSET                               0
-#define OVERRIDE_FRAME_HEIGHT                 16
-#define VFO_LETTER_Y_OFFSET                    8
-#define LH_ENTRY_V_OFFSET                      0
-#define DISPLAY_Y_POS_HEADER                   2
-#define DISPLAY_X_POS_MENU_OFFSET              0
-#define DISPLAY_X_POS_MENU_TEXT_OFFSET       (DISPLAY_X_POS_MENU_OFFSET + 0)
-#define DISPLAY_Y_POS_MENU_START             (16 + MENU_ENTRY_HEIGHT)
-#define DISPLAY_Y_POS_MENU_ENTRY_HIGHLIGHT    32
-#define DISPLAY_Y_POS_BAR                     10
-#define DISPLAY_Y_POS_CONTACT                 16
-#define DISPLAY_Y_POS_CONTACT_TX              34
-#define DISPLAY_Y_POS_CONTACT_TX_FRAME        34
-#define DISPLAY_Y_POS_CHANNEL_FIRST_LINE      32
-#define DISPLAY_Y_POS_CHANNEL_SECOND_LINE     48
-#define DISPLAY_Y_POS_SQUELCH_BAR             16
-#define DISPLAY_Y_POS_CSS_INFO                16
-#define DISPLAY_Y_POS_SQL_INFO                25
-#define DISPLAY_Y_POS_TX_TIMER                8
-#define DISPLAY_Y_POS_RX_FREQ                 32
-#define DISPLAY_Y_POS_TX_FREQ                 48
-#define DISPLAY_Y_POS_ZONE                    50
-#define DISPLAY_Y_POS_RSSI_VALUE              18
-#define DISPLAY_Y_POS_RSSI_BAR                40
-#define TITLE_BOX_HEIGHT                      21
-#else
-#define DISPLAY_H_EXTRA_PIXELS                 0
-#define DISPLAY_H_OFFSET                       0
-#define DISPLAY_V_EXTRA_PIXELS                 0
-#define DISPLAY_V_OFFSET                       0
-#define MENU_ENTRY_HEIGHT                     16
-#define SQUELCH_BAR_H                          9
-#define V_OFFSET                               0
-#define OVERRIDE_FRAME_HEIGHT                 16
-#define VFO_LETTER_Y_OFFSET                    8
-#define LH_ENTRY_V_OFFSET                      0
-#define DISPLAY_Y_POS_HEADER                   2
-#define DISPLAY_X_POS_MENU_OFFSET              0
-#define DISPLAY_X_POS_MENU_TEXT_OFFSET       (DISPLAY_X_POS_MENU_OFFSET + 0)
-#define DISPLAY_Y_POS_MENU_START             (16 + MENU_ENTRY_HEIGHT)
-#define DISPLAY_Y_POS_MENU_ENTRY_HIGHLIGHT    32
-#define DISPLAY_Y_POS_BAR                     10
-#define DISPLAY_Y_POS_CONTACT                 16
-#define DISPLAY_Y_POS_CONTACT_TX              34
-#define DISPLAY_Y_POS_CONTACT_TX_FRAME        34
-#define DISPLAY_Y_POS_CHANNEL_FIRST_LINE      32
-#define DISPLAY_Y_POS_CHANNEL_SECOND_LINE     48
-#define DISPLAY_Y_POS_SQUELCH_BAR             16
-#define DISPLAY_Y_POS_CSS_INFO                16
-#define DISPLAY_Y_POS_SQL_INFO                25
-#define DISPLAY_Y_POS_TX_TIMER                8
-#define DISPLAY_Y_POS_RX_FREQ                 32
-#define DISPLAY_Y_POS_TX_FREQ                 48
-#define DISPLAY_Y_POS_ZONE                    50
-#define DISPLAY_Y_POS_RSSI_VALUE              18
-#define DISPLAY_Y_POS_RSSI_BAR                40
+#define DISPLAY_X_POS_DBM                      80
 #define TITLE_BOX_HEIGHT                      21
 #endif
 
