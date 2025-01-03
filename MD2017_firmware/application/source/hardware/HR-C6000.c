@@ -2822,7 +2822,7 @@ void HRC6000SetFMTx(void)
 	uint8_t CTCdeviation;
 	uint8_t DCSdeviation;
 
-	if(trxGetFrequency() > 30000000)
+	if(trxGetFrequency() > 34900000)
 	{
 		if(trxGetBandwidthIs25kHz())
 		{
@@ -2896,7 +2896,7 @@ void HRC6000SetDMR(void)
 		return;
 	}
 
-	if(trxGetFrequency() > 30000000)
+	if(trxGetFrequency() > 34900000)
 	{
 		SPI0WritePageRegByte(0x04, 0x01, 0xF0);										//set 2 point Mod, receive mode IF, non inverted (for UHF)
 	}
@@ -3100,7 +3100,7 @@ void HRC6000SetDTMF(uint8_t code)
 	SPI0ReadPageRegByte(0x04, 0xA0, &savedTone1Config.Dev);		//save the current tone deviation
 	SPI0ReadPageRegByte(0x04, 0xD1, &savedTone1Config.D1);		//save the current Register D1. (undocumented high order bits are important)
 
-	if(trxGetFrequency() > 30000000)
+	if(trxGetFrequency() > 34900000)
 	{
 		if(trxGetBandwidthIs25kHz())
 		{
