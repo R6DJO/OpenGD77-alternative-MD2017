@@ -102,11 +102,7 @@ menuStatus_t menuTxScreen(uiEvent_t *ev, bool isFirstRun)
 			updateScreen();
 		}
 
-		if ((codeplugChannelGetFlag(currentChannelData, CHANNEL_FLAG_RX_ONLY) == 0) && ((nonVolatileSettings.txFreqLimited == BAND_LIMITS_NONE) || trxCheckFrequencyInAmateurBand(currentChannelData->txFreq)
-#if defined(PLATFORM_MD9600)
-				|| (codeplugChannelGetFlag(currentChannelData, CHANNEL_FLAG_OUT_OF_BAND) != 0)
-#endif
-		))
+		if ((codeplugChannelGetFlag(currentChannelData, CHANNEL_FLAG_RX_ONLY) == 0) && ( trxCheckFrequencyInAmateurBand(currentChannelData->txFreq)))
 		{
 			ticksTimerStart(&nextSecondTimer, PIT_COUNTS_PER_SECOND);
 			timeInSeconds = currentChannelData->tot * 15;
@@ -691,7 +687,7 @@ void menuTxScreenHandleTxTermination(uiEvent_t *ev, txTerminationReason_t reason
 		case TXSTOP_TIMEOUT:
 #if !defined(PLATFORM_GD77S)
 			displayThemeApply(THEME_ITEM_FG_WARNING_NOTIFICATION, THEME_ITEM_BG_NOTIFICATION);
-			displayPrintCentered(((DISPLAY_SIZE_Y - FONT_SIZE_4_HEIGHT) / 2), currentLanguage->timeout, FONT_SIZE_3);
+			displayPrintCentered(((DISPLAY_SIZE_Y - FONT_SIZE_3_HEIGHT) / 2), currentLanguage->timeout, FONT_SIZE_3);
 #endif
 
 			// From G4EML commit:

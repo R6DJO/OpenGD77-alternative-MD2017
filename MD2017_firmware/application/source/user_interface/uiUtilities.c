@@ -2547,18 +2547,7 @@ void announceEcoLevel(bool voicePromptWasPlaying)
 }
 #endif
 
-ANNOUNCE_STATIC void announceTemperature(bool voicePromptWasPlaying)
-{
-	char buffer[17];
-	int temperature = getTemperature();
-	if (!voicePromptWasPlaying)
-	{
-		voicePromptsAppendLanguageString(currentLanguage->temperature);
-	}
-	snprintf(buffer, 17, "%d.%1d", (temperature / 10), (temperature % 10));
-	voicePromptsAppendString(buffer);
-	voicePromptsAppendLanguageString(currentLanguage->celcius);
-}
+
 
 ANNOUNCE_STATIC void announceBatteryVoltage(void)
 {
@@ -2920,10 +2909,6 @@ void announceItemWithInit(bool init, voicePromptItem_t item, audioPromptThreshol
 
 		case PROMPT_SQUENCE_SQUELCH:
 			announceSquelchLevel(voicePromptWasPlaying);
-			break;
-
-		case PROMPT_SEQUENCE_TEMPERATURE:
-			announceTemperature(voicePromptWasPlaying);
 			break;
 
 		case PROMPT_SEQUENCE_DIRECTION_TX:
@@ -3772,7 +3757,7 @@ void dtmfSequenceTick(bool popPreviousMenuOnEnding)
 
 			rxPowerSavingSetState(ECOPHASE_POWERSAVE_INACTIVE);
 
-			if ((codeplugChannelGetFlag(currentChannelData, CHANNEL_FLAG_RX_ONLY) == 0) && ((nonVolatileSettings.txFreqLimited == BAND_LIMITS_NONE) || trxCheckFrequencyInAmateurBand(currentChannelData->txFreq)))
+			if ((codeplugChannelGetFlag(currentChannelData, CHANNEL_FLAG_RX_ONLY) == 0) && ((trxCheckFrequencyInAmateurBand(currentChannelData->txFreq))))
 			{
 
 				// Start TX DTMF, prepare for ANALOG

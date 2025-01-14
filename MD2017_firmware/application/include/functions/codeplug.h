@@ -130,6 +130,8 @@ typedef enum
 	CHANNEL_FLAG_RX_ONLY,
 	CHANNEL_FLAG_BW_25K,
 	CHANNEL_FLAG_SQUELCH,
+	CHANNEL_FLAG_FASTCALL,
+	CHANNEL_FLAG_PRIORITY,
 } ChannelFlag_t;
 
 // LibreDMR_flag1
@@ -152,6 +154,8 @@ typedef enum
 #define CODEPLUG_CHANNEL_FLAG4_ZONE_SKIP                         0x20
 #define CODEPLUG_CHANNEL_FLAG4_VOX                               0x40
 #define CODEPLUG_CHANNEL_FLAG4_POWER                             0x80
+#define CODEPLUG_CHANNEL_FASTCALL                                0x80
+#define CODEPLUG_CHANNEL_PRIORITY                                0x40
 
 extern int codeplugChannelsPerZone;
 
@@ -204,7 +208,7 @@ typedef struct
 	uint16_t rxTone;
 	uint16_t txTone;
 	uint8_t locationLon2;// Latitude MS byte
-	uint8_t _UNUSED_1;
+	uint8_t openGD77RUS; // 0x80: быстрый вызов канала
 	uint8_t LibreDMR_flag1; // was unmuteRule. 0x80: Optional DMRID sets, 0x40: no beep, 0x20: no Eco, 0x10: OutOfBand(MD9600 only, never saved in codeplug)
 	uint8_t rxSignaling;    // +--
 	uint8_t artsInterval;   // | These 3 bytes were repurposed for optional DMRID
@@ -399,6 +403,7 @@ bool codeplugDTMFContactGetDataForIndex(int index, struct_codeplugDTMFContact_t 
 uint32_t codeplugGetUserDMRID(void);
 void codeplugSetUserDMRID(uint32_t dmrId);
 void codeplugGetRadioName(char *buf);
+void codeplugSetRadioName(char *buf);
 void codeplugGetBootScreenData(char *line1, char *line2, uint8_t *displayType);
 void codeplugGetVFO_ChannelData(struct_codeplugChannel_t *vfoBuf, Channel_t VFONumber);
 void codeplugSetVFO_ChannelData(struct_codeplugChannel_t *vfoBuf, Channel_t VFONumber);

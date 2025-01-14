@@ -249,25 +249,32 @@ uint16_t codeplugIntToCSS(uint16_t tone)
 	return ((tone == 0x0) ? CODEPLUG_CSS_TONE_NONE : tone);
 }
 
+
 void codeplugUtilConvertBufToString(char *codeplugBuf, char *outBuf, int len)
 {
-
-	for(int i = 0; i < len; i++)
+	if (codeplugBuf[0] !=0)
 	{
-		if (codeplugBuf[i] == 0xff)
+		for(int i = 0; i < len; i++)
 		{
-			codeplugBuf[i] = 0;
+			if (codeplugBuf[i] == 0xff)
+			{
+				codeplugBuf[i] = 0;
+			}
+			if (codeplugBuf[i] == 0x7f) // замена подменного символа на "я"
+				{
+				outBuf[i] = 0xff;
+				}
+			else
+				{
+				outBuf[i] = codeplugBuf[i];
+				}
 		}
-		if (codeplugBuf[i] == 0x7f) // замена подменного символа на "я"
-			{
-			   outBuf[i] = 0xff;
-			}
-		else
-			{
-			   outBuf[i] = codeplugBuf[i];
-			}
+		outBuf[len] = 0;
 	}
-	outBuf[len] = 0;
+	else
+	{
+		outBuf[0] = 0;
+	}
 }
 
 void codeplugUtilConvertStringToBuf(char *inBuf, char *outBuf, int len)
@@ -455,6 +462,8 @@ void codeplugAllChannelsIndexSetUsed(int index)
 	}
 }
 
+
+
 void codeplugAllChannelsInitCache(void)
 {
 	// There are 8 banks
@@ -535,6 +544,11 @@ static uint8_t *_getFlag4(struct_codeplugChannel_t *chan)
 	return &chan->flag4;
 }
 
+static uint8_t *_getOpenGD77RUS(struct_codeplugChannel_t *chan)
+{
+	return &chan->openGD77RUS;
+}
+
 struct
 {
 		flagGetter_t getter;
@@ -562,7 +576,9 @@ struct
 		// Talkaround is unused (bit #3)
 		{ _getFlag4,     CODEPLUG_CHANNEL_FLAG4_RX_ONLY,                 2 }, // CHANNEL_FLAG_RX_ONLY,
 		{ _getFlag4,     CODEPLUG_CHANNEL_FLAG4_BW_25K,                  1 }, // CHANNEL_FLAG_BW_25K,
-		{ _getFlag4,     CODEPLUG_CHANNEL_FLAG4_SQUELCH,                 0 }  // CHANNEL_FLAG_SQUELCH,
+		{ _getFlag4,     CODEPLUG_CHANNEL_FLAG4_SQUELCH,                 0 }, // CHANNEL_FLAG_SQUELCH,
+		{ _getOpenGD77RUS,  CODEPLUG_CHANNEL_FASTCALL,                   7 }, // быстрый вызов канала
+		{ _getOpenGD77RUS,  CODEPLUG_CHANNEL_PRIORITY,                   6 }  // приоритет сканирования
 };
 
 //
@@ -1306,6 +1322,14 @@ void codeplugGetRadioName(char *buf)
 	memset(buf, 0, 9);
 	EEPROM_Read(CODEPLUG_ADDR_USER_CALLSIGN, (uint8_t *)buf, 8);
 	codeplugUtilConvertBufToString(buf, buf, 8);
+}
+
+void codeplugSetRadioName(char *buf)
+{
+	char temp[8];
+	codeplugUtilConvertStringToBuf(buf, temp, 8);
+	EEPROM_Write(CODEPLUG_ADDR_USER_CALLSIGN, (uint8_t *)temp, 8);
+
 }
 
 // Max length the user can enter is 16. Hence buf must be 17 chars to allow for the termination

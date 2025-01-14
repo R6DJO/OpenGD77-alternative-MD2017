@@ -578,12 +578,14 @@ void uiVFOModeUpdateScreen(int txTimeSecs)
 					if ((screenOperationMode[nonVolatileSettings.currentVFONumber] == VFO_SCREEN_OPERATION_NORMAL) ||
 							(screenOperationMode[nonVolatileSettings.currentVFONumber] == VFO_SCREEN_OPERATION_DUAL_SCAN))
 					{
-						snprintf(buffer, SCREEN_LINE_BUFFER_SIZE,
-#if defined(PLATFORM_RD5R)
-								"%c%c%c.%c%c%c%c%c",
-#else
+						if (currentLanguage->LANGUAGE_NAME[0] == 'Р')
+							snprintf(buffer, SCREEN_LINE_BUFFER_SIZE,
+															"%c%c%c.%c%c%c%c%c МГц",
+															uiDataGlobal.FreqEnter.digits[0], uiDataGlobal.FreqEnter.digits[1], uiDataGlobal.FreqEnter.digits[2],
+															uiDataGlobal.FreqEnter.digits[3], uiDataGlobal.FreqEnter.digits[4], uiDataGlobal.FreqEnter.digits[5], uiDataGlobal.FreqEnter.digits[6], uiDataGlobal.FreqEnter.digits[7]);
+						else
+						    snprintf(buffer, SCREEN_LINE_BUFFER_SIZE,
 								"%c%c%c.%c%c%c%c%c MHz",
-#endif
 								uiDataGlobal.FreqEnter.digits[0], uiDataGlobal.FreqEnter.digits[1], uiDataGlobal.FreqEnter.digits[2],
 								uiDataGlobal.FreqEnter.digits[3], uiDataGlobal.FreqEnter.digits[4], uiDataGlobal.FreqEnter.digits[5], uiDataGlobal.FreqEnter.digits[6], uiDataGlobal.FreqEnter.digits[7]);
 
@@ -643,7 +645,11 @@ void uiVFOModeUpdateScreen(int txTimeSecs)
 			}
 			displayThemeApply(THEME_ITEM_FG_HEADER_TEXT, THEME_ITEM_BG_HEADER_TEXT);
 			displayFillRect(0, DISPLAY_SIZE_Y-18, DISPLAY_SIZE_X, 18, true);
-			displayPrintAt(0, DISPLAY_Y_POS_TX_FREQ + 22, currentLanguage->vfomenu, FONT_SIZE_3);
+			if ((uiDataGlobal.Scan.active &&
+					(screenOperationMode[nonVolatileSettings.currentVFONumber] != VFO_SCREEN_OPERATION_DUAL_SCAN) && (uiDataGlobal.Scan.state == SCAN_STATE_SCANNING)))
+				displayPrintAt(0, DISPLAY_SIZE_Y-17, currentLanguage->scanmenu, FONT_SIZE_3);
+			else
+				displayPrintAt(0, DISPLAY_SIZE_Y-17, currentLanguage->vfomenu, FONT_SIZE_3);
 			displayRender();
 			displayThemeResetToDefault();
 			break;
@@ -889,6 +895,189 @@ static void toggleAnalogBandwidth(void)
 	trxSetModeAndBandwidth(RADIO_MODE_ANALOG, (bw25k != 0));
 }
 
+
+static bool talkaroundMode = false;
+static uint32_t savedTXFreq = 0;
+static bool noVFOFiltering = false;
+static uint8_t oldDMRFilter = 0;
+static uint8_t oldDestFilter = 0;
+static uint8_t oldAnalogFilter = 0;
+static uint8_t oldSubtone = 0;
+
+
+void restoreVFOFilteringStatusIfSet(void)
+{
+	if (noVFOFiltering)
+	{
+		noVFOFiltering = false;
+	    if (trxGetMode() == RADIO_MODE_DIGITAL) // отключаем фильтры для цифрового режима
+	    {
+	    	settingsSet(nonVolatileSettings.dmrCcTsFilter, oldDMRFilter);
+	    	settingsSet(nonVolatileSettings.dmrDestinationFilter, oldDestFilter);
+            HRC6000InitDigitalDmrRx();
+            HRC6000ResyncTimeSlot();
+            disableAudioAmp(AUDIO_AMP_MODE_RF);
+	    }
+	    else
+	    {
+	    	settingsSet(nonVolatileSettings.analogFilterLevel, oldAnalogFilter);
+	    	//uiDataGlobal.QuickMenu.tmpAnalogFilterLevel = oldAnalogFilter;
+	    	trxSetAnalogFilterLevel(nonVolatileSettings.analogFilterLevel);
+	    	trxSetRxCSS(RADIO_DEVICE_PRIMARY, oldSubtone);
+	    }
+	}
+}
+
+
+static void handleFastKey(uint8_t action)
+{
+	switch (action)
+	{
+	    case SK1_MODE_INFO:
+	    	if ((uiVFOModeSweepScanning(true) == false) && (monitorModeData.isEnabled == false) && (uiDataGlobal.displayChannelSettings == false))
+	    	{
+				int prevQSODisp = uiDataGlobal.displayQSOStatePrev;
+
+				uiDataGlobal.displayChannelSettings = true;
+				uiDataGlobal.displayQSOState = QSO_DISPLAY_DEFAULT_SCREEN;
+				uiVFOModeUpdateScreen(0);
+				uiDataGlobal.displayQSOStatePrev = prevQSODisp;
+				return;
+	    	}
+	    	else if (uiDataGlobal.displayChannelSettings == true)
+	    	{
+	    		uiDataGlobal.displayChannelSettings = false;
+	    		uiDataGlobal.displayQSOState = uiDataGlobal.displayQSOStatePrev;
+
+	    				// Maybe QSO State has been overridden, double check if we could now
+	    				// display QSO Data
+	    		if (uiDataGlobal.displayQSOState == QSO_DISPLAY_DEFAULT_SCREEN)
+	    		{
+	    			if (isQSODataAvailableForCurrentTalker())
+	    			{
+	    				uiDataGlobal.displayQSOState = QSO_DISPLAY_CALLER_DATA;
+	    			}
+	    		}
+
+	    				// Leaving Channel Details disable reverse repeater feature
+	    		if (uiDataGlobal.reverseRepeaterVFO)
+	    		{
+	    			trxSetFrequency(currentChannelData->rxFreq, currentChannelData->txFreq, (((currentChannelData->chMode == RADIO_MODE_DIGITAL) && codeplugChannelGetFlag(currentChannelData, CHANNEL_FLAG_FORCE_DMO)) ? DMR_MODE_DMO : DMR_MODE_AUTO));
+	    			uiDataGlobal.reverseRepeaterVFO = false;
+	    		}
+
+	    		uiVFOModeUpdateScreen(0);
+	    		return;
+	    	}
+		    break;
+	    case SK1_MODE_REVERSE:
+	    	if (!uiDataGlobal.Scan.active)
+	    	{
+	    		soundSetMelody(MELODY_ACK_BEEP);
+	    		uiDataGlobal.reverseRepeaterVFO = !uiDataGlobal.reverseRepeaterVFO;
+	    		int tmpFreq = currentChannelData->txFreq;
+	    		currentChannelData->txFreq = currentChannelData->rxFreq;
+	    		currentChannelData->rxFreq = tmpFreq;
+	    		trxSetFrequency(currentChannelData->rxFreq, currentChannelData->txFreq, (((currentChannelData->chMode == RADIO_MODE_DIGITAL) && codeplugChannelGetFlag(currentChannelData, CHANNEL_FLAG_FORCE_DMO)) ? DMR_MODE_DMO : DMR_MODE_AUTO));
+	    		if (uiDataGlobal.reverseRepeaterVFO)
+	    			uiNotificationShow(NOTIFICATION_TYPE_MESSAGE, NOTIFICATION_ID_MESSAGE, 1000, "Rx<->Tx", true);
+	    	}
+	    	else
+	    		uiVFOModeStopScanning();
+		    break;
+	    case SK1_MODE_TALKAROUND:
+	    	if (!uiDataGlobal.Scan.active)
+	    	{
+	    		if (talkaroundMode) // прямая связь уже включена, восстанавливаем старую частоту TX
+	    		{
+	    			talkaroundMode = false;
+	    			currentChannelData->txFreq = savedTXFreq;
+	    		}
+	    		else
+	    		{
+	    			soundSetMelody(MELODY_ACK_BEEP);
+	    			talkaroundMode = true;
+	    			if (talkaroundMode)
+	    				uiNotificationShow(NOTIFICATION_TYPE_MESSAGE, NOTIFICATION_ID_MESSAGE, 1000, currentLanguage->talkaround, true);
+	    		    savedTXFreq = currentChannelData->txFreq;
+	    			currentChannelData->txFreq = currentChannelData->rxFreq;
+	    		}
+    			trxSetFrequency(currentChannelData->rxFreq, currentChannelData->txFreq, (((currentChannelData->chMode == RADIO_MODE_DIGITAL) && codeplugChannelGetFlag(currentChannelData, CHANNEL_FLAG_FORCE_DMO)) ? DMR_MODE_DMO : DMR_MODE_AUTO));
+	    	}
+	    	else
+	    		uiVFOModeStopScanning();
+	    	break;
+    	case SK1_MODE_FASTCALL:
+    		if (uiDataGlobal.Scan.active)
+    		{
+    			uiVFOModeStopScanning(); // останавливаем сканирование
+    		}
+    		else
+    		{
+    			uint16_t channel = 1;
+    			struct_codeplugChannel_t tempChannel;
+    			bool found = false;
+    			while (!found && channel <= 1024)
+    			{
+    				codeplugChannelGetDataForIndex(channel, &tempChannel);
+    				found = ((codeplugChannelGetFlag(&tempChannel, CHANNEL_FLAG_FASTCALL) != 0) && (tempChannel.name[0] != 0xff));
+                    channel++;
+    			}
+    			if (found)
+    			{
+    				// найден канал быстрого вызова
+    				soundSetMelody(MELODY_ACK_BEEP);
+    				memcpy(tempChannel.name, currentChannelData->name, 16); //сохраняем имя VFO
+                    memcpy(currentChannelData, &tempChannel, sizeof(struct_codeplugChannel_t));
+                    uiVFOModeLoadChannelData(true);
+                    trxSetFrequency(currentChannelData->rxFreq, currentChannelData->txFreq, (((currentChannelData->chMode == RADIO_MODE_DIGITAL) && codeplugChannelGetFlag(currentChannelData, CHANNEL_FLAG_FORCE_DMO)) ? DMR_MODE_DMO : DMR_MODE_AUTO));
+    			}
+    			else
+    			{
+    				//канал не найден
+    				soundSetMelody(MELODY_ERROR_BEEP);
+    				uiNotificationShow(NOTIFICATION_TYPE_MESSAGE, NOTIFICATION_ID_MESSAGE, 1000, currentLanguage->notset, true);
+    			}
+    		}
+    		break;
+    	case SK1_MODE_FILTER:
+    		if (uiDataGlobal.Scan.active)
+    		{
+    			uiVFOModeStopScanning();
+    		}
+    		if (!noVFOFiltering)
+    		{
+    			noVFOFiltering = true;
+    			uiNotificationShow(NOTIFICATION_TYPE_MESSAGE, NOTIFICATION_ID_MESSAGE, 1000, currentLanguage->promiscuity, true);
+    			soundSetMelody(MELODY_ACK_BEEP);
+    		    if (trxGetMode() == RADIO_MODE_DIGITAL) // отключаем фильтры для цифрового режима
+    		    {
+                    oldDMRFilter = nonVolatileSettings.dmrCcTsFilter;
+                    settingsSet(nonVolatileSettings.dmrCcTsFilter, DMR_CCTS_FILTER_NONE);
+					oldDestFilter = nonVolatileSettings.dmrDestinationFilter;
+					settingsSet(nonVolatileSettings.dmrDestinationFilter, DMR_DESTINATION_FILTER_NONE);
+                    HRC6000InitDigitalDmrRx();
+                    HRC6000ResyncTimeSlot();
+                    disableAudioAmp(AUDIO_AMP_MODE_RF);
+    		    }
+    		    else
+    		    {
+                    oldAnalogFilter = nonVolatileSettings.analogFilterLevel;
+                    oldSubtone = currentChannelData->rxTone;
+                    settingsSet(nonVolatileSettings.analogFilterLevel, ANALOG_FILTER_NONE);
+                    //uiDataGlobal.QuickMenu.tmpAnalogFilterLevel = ANALOG_FILTER_NONE;
+                    trxSetAnalogFilterLevel(nonVolatileSettings.analogFilterLevel);
+                    trxSetRxCSS(RADIO_DEVICE_PRIMARY, codeplugGetCSSType(CSS_TYPE_NONE));
+    		    }
+    		}
+    		else
+	    		restoreVFOFilteringStatusIfSet();
+    		break;
+	}
+	uiDataGlobal.displayQSOState = QSO_DISPLAY_DEFAULT_SCREEN;
+	uiVFOModeUpdateScreen(0);
+}
+
 static void handleEvent(uiEvent_t *ev)
 {
 	if (uiDataGlobal.Scan.active && (ev->events & KEY_EVENT))
@@ -1002,15 +1191,7 @@ static void handleEvent(uiEvent_t *ev)
 		}
 #endif
 
-		if (rebuildVoicePromptOnExtraLongSK1(ev))
-		{
-			return;
-		}
 
-		if (repeatVoicePromptOnSK1(ev))
-		{
-			return;
-		}
 
 		uint32_t tg = (LinkHead->talkGroupOrPcId & 0xFFFFFF);
 
@@ -1084,7 +1265,7 @@ static void handleEvent(uiEvent_t *ev)
 			return;
 		}
 		// Display channel settings (CTCSS, Squelch) while SK1 is pressed
-		else if ((uiVFOModeSweepScanning(true) == false) && (monitorModeData.isEnabled == false) && (uiDataGlobal.displayChannelSettings == false) && BUTTONCHECK_DOWN(ev, BUTTON_SK1))
+	/*	else if ((uiVFOModeSweepScanning(true) == false) && (monitorModeData.isEnabled == false) && (uiDataGlobal.displayChannelSettings == false) && BUTTONCHECK_DOWN(ev, BUTTON_SK1))
 		{
 			int prevQSODisp = uiDataGlobal.displayQSOStatePrev;
 
@@ -1118,8 +1299,24 @@ static void handleEvent(uiEvent_t *ev)
 
 			uiVFOModeUpdateScreen(0);
 			return;
+		}*/
+		if (BUTTONCHECK_SHORTUP(ev, BUTTON_SK1)) //короткое нажатие SK1
+		{
+             handleFastKey(nonVolatileSettings.buttonSK1);
+		}
+		if (BUTTONCHECK_LONGDOWN(ev, BUTTON_SK1)) //длинное нажатие SK1
+		{
+			handleFastKey(nonVolatileSettings.buttonSK1Long);
+		}
+		if (rebuildVoicePromptOnExtraLongSK1(ev))
+		{
+			return;
 		}
 
+		if (repeatVoicePromptOnSK1(ev))
+		{
+			return;
+		}
 #if !defined(PLATFORM_RD5R)
 		if (BUTTONCHECK_SHORTUP(ev, BUTTON_ORANGE))
 		{
@@ -1545,6 +1742,7 @@ static void handleEvent(uiEvent_t *ev)
 					HRC6000ClearActiveDMRID();
 				}
 				menuVFOExitStatus |= MENU_STATUS_FORCE_FIRST;// Audible signal that the Channel screen has been selected
+				restoreVFOFilteringStatusIfSet();
 				menuSystemSetCurrentMenu(UI_CHANNEL_MODE);
 				aprsBeaconingResetTimers();
 #endif

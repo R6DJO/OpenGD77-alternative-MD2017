@@ -51,6 +51,7 @@ static char keypadAlphaKey;
 static int keypadAlphaIndex;
 volatile bool keypadAlphaEnable;
 volatile bool keypadLocked = false;
+volatile bool onlyLatin;
 
 // 360 turn is 8/9 pulses, but handling one pulse as an key event is
 // a bit too reactive. Hence, increasing the pulse per event is a bit better.
@@ -99,6 +100,19 @@ static const char keypadAlphaMap[11][31] = {
 		"*"
 };
 
+static const char keypadAlphaMapLatin[11][5] = {
+		"0 ",
+		"1",
+		"ABC2",
+		"DEF3",
+		"GHI4",
+		"JKL5",
+		"MNO6",
+		"PQRS7",
+        "TUV8",
+		"WXYZ9",
+		"*"
+};
 #define KEYBOARD_KEYS_PER_ROW  8U
 
 static const struct
@@ -472,6 +486,9 @@ void keyboardCheckKeyEvent(keyboardCode_t *keys, int *event)
 
 			if (tmp_timer_keypad == 0 && keypadAlphaKey != 0)
 			{
+if (onlyLatin)
+					keys->key = keypadAlphaMapLatin[keypadAlphaKey - 1][keypadAlphaIndex];
+				else
 				keys->key = keypadAlphaMap[keypadAlphaKey - 1][keypadAlphaIndex];
 				keys->event = KEY_MOD_PRESS;
 				*event = EVENT_KEY_CHANGE;
@@ -529,6 +546,15 @@ void keyboardCheckKeyEvent(keyboardCode_t *keys, int *event)
 					if (newAlphaKey == keypadAlphaKey)
 					{
 						keypadAlphaIndex++;
+if (onlyLatin)
+						{
+							if (keypadAlphaMapLatin[keypadAlphaKey - 1][keypadAlphaIndex] == 0)
+								{
+									keypadAlphaIndex = 0;
+								}
+						}
+						else
+						{
 						if (keypadAlphaMap[keypadAlphaKey - 1][keypadAlphaIndex] == 0)
 						{
 							keypadAlphaIndex = 0;
@@ -540,11 +566,17 @@ void keyboardCheckKeyEvent(keyboardCode_t *keys, int *event)
 				{
 					if (newAlphaKey == keypadAlphaKey)
 					{
+if (onlyLatin)
+							keys->key =	keypadAlphaMapLatin[keypadAlphaKey - 1][keypadAlphaIndex];
+						else
 						keys->key =	keypadAlphaMap[keypadAlphaKey - 1][keypadAlphaIndex];
 						keys->event = KEY_MOD_PREVIEW;
 					}
 					else
 					{
+if (onlyLatin)
+							keys->key = keypadAlphaMapLatin[keypadAlphaKey - 1][keypadAlphaIndex];
+						else
 						keys->key = keypadAlphaMap[keypadAlphaKey - 1][keypadAlphaIndex];
 						keys->event = KEY_MOD_PRESS;
 						*event = EVENT_KEY_CHANGE;
@@ -622,6 +654,7 @@ void keyboardCheckKeyEvent(keyboardCode_t *keys, int *event)
 			}
 			break;
 	}
+}
 }
 
 /*

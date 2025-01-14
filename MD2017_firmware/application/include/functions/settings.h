@@ -41,7 +41,7 @@ enum CONTACT_DISPLAY_PRIO { CONTACT_DISPLAY_PRIO_CC_DB_TA = 0, CONTACT_DISPLAY_P
 enum SCAN_MODE { SCAN_MODE_HOLD = 0, SCAN_MODE_PAUSE, SCAN_MODE_STOP };
 enum SPLIT_CONTACT { SPLIT_CONTACT_SINGLE_LINE_ONLY = 0, SPLIT_CONTACT_ON_TWO_LINES, SPLIT_CONTACT_AUTO };
 enum ALLOW_PRIVATE_CALLS_MODE { ALLOW_PRIVATE_CALLS_OFF = 0, ALLOW_PRIVATE_CALLS_ON, ALLOW_PRIVATE_CALLS_PTT };//, ALLOW_PRIVATE_CALLS_AUTO };
-enum BAND_LIMITS_ENUM { BAND_LIMITS_NONE = 0 , BAND_LIMITS_ON_LEGACY_DEFAULT, BAND_LIMITS_FROM_CPS };
+enum BAND_LIMITS_ENUM {BAND_LIMITS_ON_LEGACY_DEFAULT = 0, BAND_LIMITS_FROM_CPS };
 enum INFO_ON_SCREEN { INFO_ON_SCREEN_OFF = 0x00, INFO_ON_SCREEN_TS = 0x01, INFO_ON_SCREEN_PWR = 0x02, INFO_ON_SCREEN_BOTH = 0x03 };
 
 #if defined(HAS_GPS)
@@ -127,7 +127,6 @@ typedef enum
 #if defined(PLATFORM_MDUV380) && !defined(PLATFORM_VARIANT_UV380_PLUS_10W)
 	BIT_FORCE_10W_RADIO             = (1 << 24),
 #endif
-
 } bitfieldOptions_t;
 
 #if defined(PLATFORM_MD9600)
@@ -206,7 +205,27 @@ typedef struct
 #if defined(HAS_GPS)
 	uint8_t			gps; // Off / wait for fix / On
 #endif
+	uint8_t         buttonSK1;
+	uint8_t         buttonSK1Long;
+    uint8_t         scanPriority;
 } settingsStruct_t;
+
+enum SK1_MODE_TYPE
+{
+	SK1_MODE_INFO = 0,
+	SK1_MODE_REVERSE,
+	SK1_MODE_TALKAROUND,
+	SK1_MODE_FASTCALL,
+	SK1_MODE_FILTER,
+	SK1_MODES_MAX,
+};
+
+typedef enum
+{
+    SCAN_PM_X2  = 2,
+	SCAN_PM_X10 = 10
+
+} scanPriorityMultiplier_t;
 
 typedef enum DMR_DESTINATION_FILTER_TYPE
 {
@@ -274,8 +293,6 @@ typedef struct
 	int 			savedDMRTs;
 } monitorModeSettingsStruct_t;
 
-
-
 extern settingsStruct_t nonVolatileSettings;
 extern struct_codeplugChannel_t *currentChannelData;
 extern struct_codeplugChannel_t channelScreenChannelData;
@@ -283,7 +300,6 @@ extern struct_codeplugContact_t contactListContactData;
 extern struct_codeplugDTMFContact_t contactListDTMFContactData;
 extern int contactListContactIndex;
 extern volatile int settingsUsbMode;
-extern volatile bool settingsUsbModeDebugHaltRenderingKeypad;
 extern monitorModeSettingsStruct_t monitorModeData;
 
 // Do not use the following settingsSet<TYPE>(...) functions, use settingsSet() instead
@@ -365,5 +381,6 @@ void settingsEraseCustomContent(void);
 //void settingsInitVFOChannel(int vfoNumber);
 void enableVoicePromptsIfLoaded(bool enableFullPrompts);
 int settingsGetScanStepTimeMilliseconds(void);
+extern volatile bool settingsUsbModeDebugHaltRenderingKeypad;
 
 #endif

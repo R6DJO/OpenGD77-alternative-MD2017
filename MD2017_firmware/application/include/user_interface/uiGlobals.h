@@ -134,6 +134,10 @@ typedef uint32_t time_t_custom;     /* date/time in unix secs past 1-Jan-70 */
 #define DISPLAY_Y_POS_RSSI_BAR               (40 + DISPLAY_V_OFFSET)
 #define TITLE_BOX_HEIGHT                      21
 #elif defined(PLATFORM_MD2017)
+#define DISPLAY_X_POS_FASTCALL               (DISPLAY_SIZE_X - 13)
+#define DISPLAY_X_POS_PRIORITY               (DISPLAY_SIZE_X - 26)
+#define DISPLAY_Y_POS_FASTCALL                16
+#define DISPLAY_Y_POS_PRIORITY                16
 #define DISPLAY_X_POS_GPS 4
 #define DISPLAY_X_POS_APRS 30
 #define DISPLAY_Y_POS_SECONDSTRING 13
@@ -524,6 +528,10 @@ extern settingsStruct_t 		originalNonVolatileSettings; // used to store previous
 #if !defined(PLATFORM_GD77S)
 extern aprsBeaconingSettings_t 	aprsSettingsCopy; // used to store previous APRS settings in options edition related menu.
 #endif
+
+extern void restoreVFOFilteringStatusIfSet(void);
+extern void restoreChFilteringStatusIfSet(void);
+
 
 extern struct_codeplugZone_t 	currentZone;
 extern struct_codeplugRxGroup_t currentRxGroupData;

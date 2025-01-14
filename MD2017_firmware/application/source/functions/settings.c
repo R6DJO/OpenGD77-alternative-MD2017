@@ -40,7 +40,7 @@
 #endif
 
 
-#define STORAGE_MAGIC_NUMBER          0x477B // NOTE: never use 0xDEADBEEF, it's reserved value
+#define STORAGE_MAGIC_NUMBER          0x477D // NOTE: never use 0xDEADBEEF, it's reserved value
 // 0x477B: adds gpsLogMemBlockNum.
 // 0x477A: keypadTimer{Long/Repeat} changed from u16 to u8, autolockTimer added.
 // 0x4779: APRS beaconing settings added.
@@ -71,6 +71,7 @@ struct_codeplugDTMFContact_t contactListDTMFContactData;
 struct_codeplugChannel_t settingsVFOChannel[2];// VFO A and VFO B from the codeplug.
 volatile int settingsUsbMode = USB_MODE_CPS;
 volatile bool settingsUsbModeDebugHaltRenderingKeypad = false;
+
 
 int16_t *nextKeyBeepMelody = (int16_t *)MELODY_KEY_BEEP;
 struct_codeplugGeneralSettings_t settingsCodeplugGeneralSettings;
@@ -269,7 +270,7 @@ bool settingsRestoreDefaultSettings(void)
 #else
 			BACKLIGHT_MODE_AUTO;
 #endif
-	nonVolatileSettings.backLightTimeout = 0U;//0 = never timeout. 1 - 255 time in seconds
+	nonVolatileSettings.backLightTimeout = 5U;//0 = never timeout. 1 - 255 time in seconds
 	nonVolatileSettings.displayContrast =
 #if defined(PLATFORM_DM1801) || defined(PLATFORM_DM1801A)
 			0x0e; // 14
@@ -290,7 +291,7 @@ bool settingsRestoreDefaultSettings(void)
 	nonVolatileSettings.extendedInfosOnScreen = INFO_ON_SCREEN_OFF;
 	nonVolatileSettings.txFreqLimited =
 #if defined(PLATFORM_GD77S)
-			BAND_LIMITS_NONE;//GD-77S is channelised, and there is no way to disable band limits from the UI, so disable limits by default.
+			BAND_LIMITS_ON_LEGACY_DEFAULT;//GD-77S is channelised, and there is no way to disable band limits from the UI, so disable limits by default.
 #else
 			BAND_LIMITS_ON_LEGACY_DEFAULT;// Limit Tx frequency to US Amateur bands
 #endif
@@ -338,11 +339,11 @@ bool settingsRestoreDefaultSettings(void)
 	nonVolatileSettings.scanDelay = 5U;// 5 seconds
 	nonVolatileSettings.scanStepTime = 0;// 30ms
 	nonVolatileSettings.scanModePause = SCAN_MODE_HOLD;
-	nonVolatileSettings.squelchDefaults[RADIO_BAND_VHF]		= 10U;// 1 - 21 = 0 - 100% , same as from the CPS variable squelch
+	nonVolatileSettings.squelchDefaults[RADIO_BAND_VHF]		= 4U;// 1 - 21 = 0 - 100% , same as from the CPS variable squelch
 #if !(defined(PLATFORM_MD9600) || defined(PLATFORM_MD380))
-	nonVolatileSettings.squelchDefaults[RADIO_BAND_220MHz]	= 10U;// 1 - 21 = 0 - 100% , same as from the CPS variable squelch
+	nonVolatileSettings.squelchDefaults[RADIO_BAND_220MHz]	= 4U;// 1 - 21 = 0 - 100% , same as from the CPS variable squelch
 #endif
-	nonVolatileSettings.squelchDefaults[RADIO_BAND_UHF]		= 10U;// 1 - 21 = 0 - 100% , same as from the CPS variable squelch
+	nonVolatileSettings.squelchDefaults[RADIO_BAND_UHF]		= 4U;// 1 - 21 = 0 - 100% , same as from the CPS variable squelch
 	nonVolatileSettings.hotspotType =
 #if defined(PLATFORM_GD77S)
 			HOTSPOT_TYPE_MMDVM;
@@ -372,7 +373,7 @@ bool settingsRestoreDefaultSettings(void)
 #if defined(PLATFORM_GD77S)
 	nonVolatileSettings.audioPromptMode = AUDIO_PROMPT_MODE_VOICE_LEVEL_3;
 #else
-	nonVolatileSettings.audioPromptMode = (voicePromptDataIsLoaded ? AUDIO_PROMPT_MODE_VOICE_LEVEL_1 : AUDIO_PROMPT_MODE_BEEP);
+	nonVolatileSettings.audioPromptMode = AUDIO_PROMPT_MODE_BEEP;
 #endif
 
 	nonVolatileSettings.temperatureCalibration = 0;
@@ -402,7 +403,8 @@ bool settingsRestoreDefaultSettings(void)
 	nonVolatileSettings.UNUSED_1 = 0;
 	nonVolatileSettings.UNUSED_2 = 0;
 #endif
-
+	nonVolatileSettings.buttonSK1 = SK1_MODE_INFO;
+    nonVolatileSettings.scanPriority = SCAN_PM_X2;
 #if !defined(PLATFORM_GD77S)
 	aprsBeaconingUpdateSystemSettingsFromConfiguration();
 #endif

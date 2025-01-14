@@ -32,23 +32,17 @@
 
 #define CHAR_CONSTANTS_ONLY // Needed to get FONT_CHAR_* glyph offsets
 #if defined(PLATFORM_MD9600)
-	#if defined(LANGUAGE_BUILD_JAPANESE)
-		#include "hardware/ST7567_charset_JA.h"
-	#else
+
 		#include "hardware/ST7567_charset.h"
-	#endif
+
 #elif (defined(PLATFORM_MDUV380) || defined(PLATFORM_MD380) || defined(PLATFORM_RT84_DM1701) || defined(PLATFORM_MD2017))
-	#if defined(LANGUAGE_BUILD_JAPANESE)
-		#include "hardware/HX8353E_charset_JA.h"
-	#else
+
 		#include "hardware/HX8353E_charset.h"
-	#endif
+
 #else
-	#if defined(LANGUAGE_BUILD_JAPANESE)
-		#include "hardware/UC1701_charset_JA.h"
-	#else
+
 		#include "hardware/UC1701_charset.h"
-	#endif
+
 #endif
 
 static void updateScreen(bool isFirstRun);
@@ -56,14 +50,12 @@ static void handleEvent(uiEvent_t *ev);
 static menuStatus_t menuLanguageExitCode = MENU_STATUS_SUCCESS;
 
 
-static void clearNonLatinChar(uint8_t *str)
-{}
 
 menuStatus_t menuLanguage(uiEvent_t *ev, bool isFirstRun)
 {
 	if (isFirstRun)
 	{
-		menuDataGlobal.numItems = languagesGetCount();
+		menuDataGlobal.numItems = 2;
 
 		voicePromptsInit();
 		voicePromptsAppendPrompt(PROMPT_SILENCE);
@@ -116,8 +108,6 @@ static void updateScreen(bool isFirstRun)
 					char buffer[17];
 
 					snprintf(buffer, 17, "%s", (char *)languages[mNum].LANGUAGE_NAME);
-
-					clearNonLatinChar((uint8_t *)&buffer[0]);
 
 					if (isFirstRun == false)
 					{
