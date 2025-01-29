@@ -61,10 +61,16 @@ typedef struct
 
 typedef struct calibrationPowerValues
 {
-	uint32_t veryLowPower;
-	uint32_t lowPower;
-	uint32_t midPower;
-	uint32_t highPower;
+	uint16_t power0;
+	uint16_t power1;
+	uint16_t power2;
+	uint16_t power3;
+	uint16_t power4;
+	uint16_t lowPower;
+	uint16_t midLowPower;
+	uint16_t midPower;
+	uint16_t highPower;
+
 } calibrationPowerValues_t;
 
 typedef struct calibrationRSSIMeter

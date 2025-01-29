@@ -280,7 +280,8 @@ void powerDown(bool doNotSavePowerOffState)
 		batteryRAM_Write(0,(uint8_t *)&radioIsInStandby,2);
 #endif
 	}
-
+	restoreVFOFilteringStatusIfSet();
+	restoreChFilteringStatusIfSet();
 	settingsSaveSettings(true);
 	codeplugSaveLastUsedChannelInZone();
 
@@ -793,6 +794,8 @@ void powerOffFinalStage(bool maintainRTC, bool forceSuspend)
 #endif
 
 	m = ticksGetMillis();
+	restoreVFOFilteringStatusIfSet();
+	restoreChFilteringStatusIfSet();
 	settingsSaveSettings(true);
 
 	// Give it a bit of time before pulling the plug as DM-1801 EEPROM looks slower

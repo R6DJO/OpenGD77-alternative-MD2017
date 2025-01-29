@@ -47,12 +47,7 @@ const frequencyHardwareBand_t RADIO_HARDWARE_FREQUENCY_BANDS[RADIO_BANDS_TOTAL_N
 														.minFreq=13600000,
 														.maxFreq=17400000
 													},// VHF
-#if !(defined(PLATFORM_MD9600) || defined(PLATORM_MD380)
-													{
-														.minFreq=20000000,
-														.maxFreq=26000000
-													},// 220Mhz
-#endif
+
 													{
 														.minFreq=40000000,
 														.maxFreq=52000000
@@ -63,15 +58,9 @@ const frequencyHardwareBand_t RADIO_HARDWARE_FREQUENCY_BANDS[RADIO_BANDS_TOTAL_N
 													{
 														.calTableMinFreq = 13600000,
 														.minFreq=12700000,
-														.maxFreq=34900000
+														.maxFreq=17400000
 													},// VHF
-#if !(defined(PLATFORM_MD9600) || defined(PLATFORM_MD380))
-													{
-														.calTableMinFreq = 13600000,
-														.minFreq=19000000,
-														.maxFreq=28200000
-													},// 220Mhz
-#endif
+
 													{
 														.calTableMinFreq = 40000000,
 														.minFreq=38000000,
@@ -113,10 +102,7 @@ frequencyBand_t USER_FREQUENCY_BANDS[RADIO_BANDS_TOTAL_NUM] =  {
 														.minFreq=14400000,
 														.maxFreq=14800000
 													},// VHF
-													{
-														.minFreq=22200000,
-														.maxFreq=22500000
-													},// 220Mhz
+
 													{
 														.minFreq=42000000,
 														.maxFreq=45000000
@@ -128,10 +114,7 @@ const frequencyBand_t DEFAULT_USER_FREQUENCY_BANDS[RADIO_BANDS_TOTAL_NUM] =  {
 														.minFreq=14400000,
 														.maxFreq=14800000
 													},// VHF
-													{
-														.minFreq=22200000,
-														.maxFreq=22500000
-													},// 220Mhz
+
 													{
 														.minFreq=42000000,
 														.maxFreq=45000000
@@ -445,9 +428,7 @@ bool trxCheckFrequencyInAmateurBand(uint32_t frequency)
 	else if (nonVolatileSettings.txFreqLimited == BAND_LIMITS_ON_LEGACY_DEFAULT)
 	{
 		return ((frequency >= DEFAULT_USER_FREQUENCY_BANDS[RADIO_BAND_VHF].minFreq) && (frequency <= DEFAULT_USER_FREQUENCY_BANDS[RADIO_BAND_VHF].maxFreq)) ||
-#if !(defined(PLATFORM_MD9600) || defined(PLATFORM_MD380))
-			((frequency >= DEFAULT_USER_FREQUENCY_BANDS[RADIO_BAND_220MHz].minFreq) && (frequency <= DEFAULT_USER_FREQUENCY_BANDS[RADIO_BAND_220MHz].maxFreq)) ||
-#endif
+
 			((frequency >= DEFAULT_USER_FREQUENCY_BANDS[RADIO_BAND_UHF].minFreq) && (frequency <= DEFAULT_USER_FREQUENCY_BANDS[RADIO_BAND_UHF].maxFreq));
 	}
 
@@ -928,38 +909,31 @@ void trxUpdate_PA_DAC_Drive(void)
 	switch(currentRadioDevice->txPowerLevel)
 	{
 		case 0:// 50mW
-			if(trxPowerSettings.veryLowPower > 160)
-			{
-				txDACDrivePower = trxPowerSettings.veryLowPower - 160 ;		           //50mW power setting using a typical value for low gain radios
-			}
-			else
-			{
-				txDACDrivePower = 0 ;		           //min power setting for high gain radios (may still be more than 50mW)
-			}
+			txDACDrivePower = trxPowerSettings.power0;
 			break;
 		case 1:// 250mW
-			txDACDrivePower = trxPowerSettings.veryLowPower;
+			txDACDrivePower = trxPowerSettings.power1;
 			break;
 		case 2:// 500mW
-			txDACDrivePower = trxPowerSettings.veryLowPower + ((trxPowerSettings.lowPower - trxPowerSettings.veryLowPower)*0.33);
+			txDACDrivePower = trxPowerSettings.power2;
 			break;
 		case 3:// 750mW
-			txDACDrivePower = trxPowerSettings.veryLowPower + ((trxPowerSettings.lowPower - trxPowerSettings.veryLowPower)*0.66);
+			txDACDrivePower = trxPowerSettings.power3;
 			break;
 		case 4:// 1W
-			txDACDrivePower = trxPowerSettings.lowPower;
+			txDACDrivePower = trxPowerSettings.power4;
 			break;
 		case 5:// 2W
-			txDACDrivePower = trxPowerSettings.midPower;
+			txDACDrivePower = trxPowerSettings.lowPower;
 			break;
 		case 6:// 3W
-			txDACDrivePower = trxPowerSettings.midPower + ((trxPowerSettings.highPower - trxPowerSettings.midPower)*0.5);
+			txDACDrivePower = trxPowerSettings.midLowPower;
 			break;
 		case 7:// 4W
-			txDACDrivePower = trxPowerSettings.highPower;
+			txDACDrivePower = trxPowerSettings.midPower;
 			break;
 		case 8:// 5W
-			txDACDrivePower = trxPowerSettings.highPower + ((trxPowerSettings.highPower - trxPowerSettings.midPower)*0.5);
+			txDACDrivePower = trxPowerSettings.highPower;
 			break;
 		case 9:// +W-
 			txDACDrivePower = nonVolatileSettings.userPower;

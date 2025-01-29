@@ -391,6 +391,9 @@ static void displayDirectionInfoBackground(DirectionFieldsFlags_t flags)
 			displayDrawFastVLine(((DIRECTION_ALT_X_POS - 7) + ((4 * 8) + 7) + 8), ((DIRECTION_ALT_Y_POS - 4) + (FONT_SIZE_3_HEIGHT - 1)), 4, true);
 #else
 			displayPrintAt(DIRECTION_ALT_X_POS, (DIRECTION_ALT_Y_POS - 3), currentLanguage->altitude, FONT_SIZE_2);
+			if (currentLanguage->LANGUAGE_NAME[0] == 'Р')
+				displayPrintAt((DIRECTION_ALT_X_POS + (4 * 16) + 2), (DIRECTION_ALT_Y_POS + 18), " м", FONT_SIZE_2);
+			else
 			displayPrintAt((DIRECTION_ALT_X_POS + (4 * 16) + 2), (DIRECTION_ALT_Y_POS + 18), "m", FONT_SIZE_2);
 			displayDrawFastHLine((DIRECTION_ALT_X_POS - 6), (DIRECTION_ALT_Y_POS - 5), 5, true);
 			displayDrawFastVLine((DIRECTION_ALT_X_POS - 6), (DIRECTION_ALT_Y_POS - 4), FONT_SIZE_4_HEIGHT, true);
@@ -407,8 +410,16 @@ static void displayDirectionInfoBackground(DirectionFieldsFlags_t flags)
 			displayDrawFastHLine((DIRECTION_HDOP_X_POS - 7), ((DIRECTION_HDOP_Y_POS - 8) + FONT_SIZE_3_HEIGHT + 6), ((2 * 8) + 7 + 8), true);
 			displayDrawFastVLine(((DIRECTION_HDOP_X_POS - 7) + ((2 * 8) + 7) + 8), ((DIRECTION_HDOP_Y_POS - 4) + (FONT_SIZE_3_HEIGHT - 1)), 4, true);
 #else
+			if (currentLanguage->LANGUAGE_NAME[0] == 'Р')
+			{
+				displayPrintAt(DIRECTION_HDOP_X_POS, (DIRECTION_HDOP_Y_POS - 3), "Ош.", FONT_SIZE_2);
+				displayPrintAt((DIRECTION_HDOP_X_POS + (2 * 16) + 2), (DIRECTION_HDOP_Y_POS + 18), "м", FONT_SIZE_2);
+			}
+			else
+			{
 			displayPrintAt(DIRECTION_HDOP_X_POS, (DIRECTION_HDOP_Y_POS - 3), "HDOP", FONT_SIZE_2);
 			displayPrintAt((DIRECTION_HDOP_X_POS + (2 * 16) + 2), (DIRECTION_HDOP_Y_POS + 18), "m", FONT_SIZE_2);
+			}
 			displayDrawFastHLine((DIRECTION_HDOP_X_POS - 6), (DIRECTION_HDOP_Y_POS - 5), 5, true);
 			displayDrawFastVLine((DIRECTION_HDOP_X_POS - 6), (DIRECTION_HDOP_Y_POS - 4), FONT_SIZE_4_HEIGHT, true);
 			displayDrawFastHLine((DIRECTION_HDOP_X_POS - 6), ((DIRECTION_HDOP_Y_POS - 4) + FONT_SIZE_4_HEIGHT), ((2 * 16) + 7 + 10), true);
@@ -469,7 +480,9 @@ static void displayDirectionInfoBackground(DirectionFieldsFlags_t flags)
 			}
 
 
-			// Speed
+			if (currentLanguage->LANGUAGE_NAME[0] == 'Р')
+				displayPrintAt((DIRECTION_SPEED_X_POS + (3 * VALUES_FONT_WIDTH) + 2), (DIRECTION_SPEED_Y_POS + UNITS_Y_OFFSET), "км/ч", UNITS_FONT_SIZE);
+			else
 			displayPrintAt((DIRECTION_SPEED_X_POS + (3 * VALUES_FONT_WIDTH) + 2), (DIRECTION_SPEED_Y_POS + UNITS_Y_OFFSET), "km/h", UNITS_FONT_SIZE);
 		}
 
@@ -893,7 +906,19 @@ static bool displayCoords(bool isFirstRun, bool forceRedraw)
 #endif
 
 			displayPrintAt(MAIDENHEAD_HDOP_MARGIN, MAIDENHEAD_HDOP_Y_POS, maidenheadBuf, FONT_SIZE_3);
-
+			if (currentLanguage->LANGUAGE_NAME[0] == 'Р')
+			{
+				if (gpsData.AccuracyInCm < 100)
+				{
+					snprintf(buffer, SCREEN_LINE_BUFFER_SIZE, "%s", "+/-<1 м");
+				}
+				else
+				{
+					snprintf(buffer, SCREEN_LINE_BUFFER_SIZE, "+/-%d м", (gpsData.AccuracyInCm / 100));
+				}
+			}
+			else
+			{
 			if (gpsData.AccuracyInCm < 100)
 			{
 				snprintf(buffer, SCREEN_LINE_BUFFER_SIZE, "%s", "+/-<1m");
@@ -902,7 +927,7 @@ static bool displayCoords(bool isFirstRun, bool forceRedraw)
 			{
 				snprintf(buffer, SCREEN_LINE_BUFFER_SIZE, "+/-%dm", (gpsData.AccuracyInCm / 100));
 			}
-
+			}
 			displayPrintAt((DISPLAY_SIZE_X - ((strlen(buffer) * 8) + MAIDENHEAD_HDOP_MARGIN)), MAIDENHEAD_HDOP_Y_POS, buffer, FONT_SIZE_3);
 
 			return true;
@@ -1120,6 +1145,14 @@ static void updateScreen(bool isFirstRun, bool forceRedraw)
 		char buffer[SCREEN_LINE_BUFFER_SIZE];
 
 		displayClearBuf();
+		if (nonVolatileSettings.gps > GPS_MODE_OFF)
+		{
+		if (isGlonassMode)
+			menuDisplayTitle(currentLanguage->gpsModuleCustom);
+		else
+			menuDisplayTitle(currentLanguage->gpsModuleFactory);
+		}
+		else
 		menuDisplayTitle(currentLanguage->gps);
 
 		snprintf(buffer, SCREEN_LINE_BUFFER_SIZE, "%d/%d", (menuDataGlobal.currentItemIndex + 1), PAGES_MAX);
@@ -1177,18 +1210,20 @@ static void handleEvent(uiEvent_t *ev)
 	if (KEYCHECK_SHORTUP(ev->keys, KEY_UP))
 	{
 		if (menuDataGlobal.currentItemIndex > PAGE_COORDS)
-		{
+
 			menuDataGlobal.currentItemIndex--;
-			isDirty = true;
-		}
+		else
+			menuDataGlobal.currentItemIndex = PAGES_MAX - 1;
+		isDirty = true;
 	}
 	else if (KEYCHECK_SHORTUP(ev->keys, KEY_DOWN))
 	{
 		if (menuDataGlobal.currentItemIndex < (PAGES_MAX - 1))
-		{
+
 			menuDataGlobal.currentItemIndex++;
-			isDirty = true;
-		}
+		else
+			menuDataGlobal.currentItemIndex = PAGE_COORDS;
+		isDirty = true;
 	}
 	else if ((KEYCHECK_SHORTUP(ev->keys, KEY_GREEN) && BUTTONCHECK_DOWN(ev, BUTTON_SK2))
 #if defined(PLATFORM_MD9600) || defined(CPU_MK22FN512VLL12)

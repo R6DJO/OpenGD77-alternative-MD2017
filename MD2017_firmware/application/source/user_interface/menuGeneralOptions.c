@@ -355,7 +355,7 @@ static void updateScreen(bool isFirstRun)
 					break;
 #endif
 				case GENERAL_OPTIONS_MENU_SATELLITE_MANUAL_AUTO:
-					leftSide = currentLanguage->satellite_short;
+					leftSide = currentLanguage->satellite;
 					rightSideConst = (settingsIsOptionBitSet(BIT_SATELLITE_MANUAL_AUTO) ? currentLanguage->Auto : currentLanguage->manual);
 					break;
 #if defined(HAS_GPS)

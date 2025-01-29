@@ -111,13 +111,7 @@ int adcGetVOX(void)
 	return ((micLevel > 255) ? 255 : PointTwodBs[micLevel]);
 }
 
-int getTemperature(void)
-{
-	const int tV25 = 943;					// ADC Value at 25 degrees from data sheet (0.76V with 12 Bit ADC ref=3V3)
-    const int tslope = 31;	                //Slope from datasheet ADC Counts *10
 
-    return (((temperatureLevel - tV25) * 100) / tslope) + 250 + (nonVolatileSettings.temperatureCalibration * 5);
-}
 
 #if defined(PLATFORM_MD2017)
 
